@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell Your Bike - DelhiBikesHub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-motorcycle"></i>
+                    <span>DelhiBikesHub</span>
+                </a>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="bikes.html">All Bikes</a></li>
+                    <li><a href="add.html" class="active">Sell Bike</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="login.html" class="btn-login">Login</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Sell Your Bike in Delhi</h1>
+            <p>Fill the form below to list your bike or scooty on DelhiBikesHub</p>
+        </div>
+    </section>
+
+    <!-- Add Bike Form -->
+    <section class="add-bike">
+        <div class="container">
+            <div class="form-container">
+                <form id="addBikeForm">
+                    <div class="form-section">
+                        <h3><i class="fas fa-bicycle"></i> Basic Information</h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bikeType">Bike Type *</label>
+                                <select id="bikeType" name="bikeType" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Bike">Bike</option>
+                                    <option value="Scooty">Scooty</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="bikeBrand">Brand *</label>
+                                <select id="bikeBrand" name="bikeBrand" required>
+                                    <option value="">Select Brand</option>
+                                    <option value="Hero">Hero</option>
+                                    <option value="Honda">Honda</option>
+                                    <option value="Bajaj">Bajaj</option>
+                                    <option value="TVS">TVS</option>
+                                    <option value="Yamaha">Yamaha</option>
+                                    <option value="Suzuki">Suzuki</option>
+                                    <option value="Royal Enfield">Royal Enfield</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bikeModel">Model *</label>
+                                <input type="text" id="bikeModel" name="bikeModel"
+                                    placeholder="e.g. Activa 125, Splendor Plus" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="bikeYear">Year *</label>
+                                <select id="bikeYear" name="bikeYear" required>
+                                    <option value="">Select Year</option>
+                                    <!-- Years will be populated by JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="kmDriven">KM Driven *</label>
+                                <input type="number" id="kmDriven" name="kmDriven" placeholder="e.g. 15000" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="price">Price (₹) *</label>
+                                <input type="number" id="price" name="price" placeholder="e.g. 45000" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description *</label>
+                            <textarea id="description" name="description" rows="4"
+                                placeholder="Describe your bike's condition, features, reason for selling, etc."
+                                required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-map-marker-alt"></i> Location Details</h3>
+
+                        <div class="form-group">
+                            <label for="city">City *</label>
+                            <input type="text" id="city" name="city" value="Delhi" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="locality">Locality in Delhi *</label>
+                            <select id="locality" name="locality" required>
+                                <option value="">Select Locality</option>
+                                <option value="Karol Bagh">Karol Bagh</option>
+                                <option value="Lajpat Nagar">Lajpat Nagar</option>
+                                <option value="Rohini">Rohini</option>
+                                <option value="Dwarka">Dwarka</option>
+                                <option value="Shahdara">Shahdara</option>
+                                <option value="Connaught Place">Connaught Place</option>
+                                <option value="Pitampura">Pitampura</option>
+                                <option value="Janakpuri">Janakpuri</option>
+                                <option value="Rajouri Garden">Rajouri Garden</option>
+                                <option value="Mayur Vihar">Mayur Vihar</option>
+                                <option value="Saket">Saket</option>
+                                <option value="Vasant Kunj">Vasant Kunj</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-images"></i> Upload Images</h3>
+                        <p class="form-help">Upload clear images of your bike from different angles (3-8 images
+                            recommended)</p>
+
+                        <div class="image-upload-area" id="imageUploadArea">
+                            <div class="upload-box" id="uploadBox">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Click to upload bike images</p>
+                                <span>JPG, PNG (Max 2MB each)</span>
+                                <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
+                            </div>
+
+                            <div class="uploaded-images" id="uploadedImages">
+                                <!-- Uploaded images will appear here -->
+                            </div>
+                        </div>
+
+                        <div class="image-preview" id="imagePreview">
+                            <!-- Image previews will appear here -->
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-user"></i> Seller Information</h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="sellerName">Your Name *</label>
+                                <input type="text" id="sellerName" name="sellerName" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sellerPhone">Phone Number *</label>
+                                <input type="tel" id="sellerPhone" name="sellerPhone" pattern="[0-9]{10}"
+                                    placeholder="10-digit mobile number" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sellerEmail">Email Address</label>
+                            <input type="email" id="sellerEmail" name="sellerEmail" placeholder="Optional">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-paper-plane"></i> Submit Listing
+                        </button>
+                        <button type="reset" class="btn-reset">
+                            <i class="fas fa-redo"></i> Reset Form
+                        </button>
+                    </div>
+
+                    <div class="form-notice">
+                        <p><i class="fas fa-info-circle"></i> By submitting this form, you agree to our <a
+                                href="#">Terms of Service</a>. Your contact details will be shared with interested
+                            buyers.</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo">
+                        <i class="fas fa-motorcycle"></i>
+                        <span>DelhiBikesHub</span>
+                    </a>
+                    <p>Delhi's trusted marketplace for buying and selling used bikes and scooties. Connecting buyers and
+                        sellers across Delhi since 2023.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="bikes.html">All Bikes</a></li>
+                        <li><a href="add.html">Sell Bike</a></li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Popular Localities</h3>
+                    <ul>
+                        <li><a href="bikes.html?location=Karol Bagh">Karol Bagh</a></li>
+                        <li><a href="bikes.html?location=Lajpat Nagar">Lajpat Nagar</a></li>
+                        <li><a href="bikes.html?location=Rohini">Rohini</a></li>
+                        <li><a href="bikes.html?location=Dwarka">Dwarka</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Contact Us</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-map-marker-alt"></i> Delhi, India</li>
+                        <li><i class="fas fa-phone"></i> +91 8252574286</li>
+                        <li><i class="fas fa-envelope"></i> info@delhibikeshub.com</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2023 DelhiBikesHub. All rights reserved.</p>
+                <p class="developer-credit">
+                    Developed by <a href="https://mdtanveeralam.vercel.app/" target="_blank" rel="noopener">Md Tanveer
+                        Alam</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Initialize add bike page
+        document.addEventListener('DOMContentLoaded', function () {
+            // Populate year dropdown
+            const yearSelect = document.getElementById('bikeYear');
+            const currentYear = new Date().getFullYear();
+            for (let year = currentYear; year >= 2000; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+
+            // Check if user is logged in
+            const currentUser = getCurrentUser();
+            if (currentUser) {
+                document.getElementById('sellerName').value = currentUser.name;
+                document.getElementById('sellerEmail').value = currentUser.email;
+            } else {
+                // If not logged in, show message
+                document.getElementById('addBikeForm').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    alert('Please login to submit a bike listing.');
+                    window.location.href = 'login.html';
+                });
+            }
+
+            // Setup image upload
+            const uploadBox = document.getElementById('uploadBox');
+            const imageInput = document.getElementById('imageInput');
+            const imagePreview = document.getElementById('imagePreview');
+
+            uploadBox.addEventListener('click', function () {
+                imageInput.click();
+            });
+
+            imageInput.addEventListener('change', function () {
+                const files = this.files;
+                imagePreview.innerHTML = '';
+
+                for (let i = 0; i < Math.min(files.length, 8); i++) {
+                    const file = files[i];
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        const imgContainer = document.createElement('div');
+                        imgContainer.className = 'preview-img';
+
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.className = 'remove-img';
+                        removeBtn.innerHTML = '×';
+                        removeBtn.addEventListener('click', function () {
+                            imgContainer.remove();
+                        });
+
+                        imgContainer.appendChild(img);
+                        imgContainer.appendChild(removeBtn);
+                        imagePreview.appendChild(imgContainer);
+                    }
+
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Handle form submission
+            document.getElementById('addBikeForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Get form data
+                const bikeData = {
+                    id: Date.now(), // Generate unique ID
+                    type: document.getElementById('bikeType').value,
+                    brand: document.getElementById('bikeBrand').value,
+                    model: document.getElementById('bikeModel').value,
+                    year: document.getElementById('bikeYear').value,
+                    km: document.getElementById('kmDriven').value,
+                    price: document.getElementById('price').value,
+                    description: document.getElementById('description').value,
+                    city: document.getElementById('city').value,
+                    locality: document.getElementById('locality').value,
+                    sellerName: document.getElementById('sellerName').value,
+                    sellerPhone: document.getElementById('sellerPhone').value,
+                    sellerEmail: document.getElementById('sellerEmail').value,
+                    date: new Date().toISOString(),
+                    userId: currentUser ? currentUser.id : null
+                };
+
+                // Save to localStorage
+                saveBikeListing(bikeData);
+
+                // Show success message
+                alert('Your bike listing has been submitted successfully!');
+                window.location.href = 'dashboard.html';
+            });
+        });
+
+        // Function to save bike listing
+        function saveBikeListing(bikeData) {
+            let bikes = JSON.parse(localStorage.getItem('delhibikeshub_bikes')) || [];
+            bikes.push(bikeData);
+            localStorage.setItem('delhibikeshub_bikes', JSON.stringify(bikes));
+        }
+
+        // Function to get current user
+        function getCurrentUser() {
+            const currentUser = JSON.parse(localStorage.getItem('delhibikeshub_currentUser'));
+            return currentUser;
+        }
+    </script>
+</body>
+
+</html>

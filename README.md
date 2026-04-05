@@ -1,148 +1,193 @@
-# DelhiBikesHub - Buy & Sell Used Bikes & Scooties in Delhi
+# 🏍️ DelhiBikesHub
 
-A complete frontend marketplace website for buying and selling used bikes and scooties in Delhi, built with HTML, CSS, and JavaScript only.
+> Delhi's #1 marketplace for buying and selling pre-owned bikes & scooties.
 
-## Features
+A full-stack web application built with **React + Vite** (frontend) and **Express + Supabase** (backend), featuring Cloudinary image uploads, role-based admin panel, and full mobile responsiveness.
 
-1. **Responsive Design** - Works on all devices (desktop, tablet, mobile)
-2. **Multi-Page Website** - 7 complete pages with full functionality
-3. **Local Storage** - All data is stored in browser's localStorage
-4. **User Authentication** - Login/Signup system
-5. **Bike Listings** - Add, view, edit, delete bike listings
-6. **Advanced Filtering** - Filter bikes by brand, type, price, location
-7. **Delhi Localities** - Focus on Delhi areas with locality filters
-8. **Modern UI** - Clean, attractive design with smooth animations
+---
 
-## Pages
+## 📁 Project Structure
 
-1. **Homepage** (`index.html`) - Hero section, search, popular localities, featured bikes
-2. **All Bikes** (`bikes.html`) - Browse all bikes with filtering and sorting
-3. **Bike Details** (`details.html`) - View bike details with image gallery
-4. **Add Bike** (`add.html`) - Form to list a bike for sale
-5. **Login** (`login.html`) - User login page
-6. **Signup** (`signup.html`) - User registration page
-7. **Dashboard** (`dashboard.html`) - User profile and listing management
-
-## How to Use
-
-1. **Open the Website**: Open `index.html` in your browser
-2. **Browse Bikes**: Click "All Bikes" to see available listings
-3. **Search & Filter**: Use search bar or filters to find specific bikes
-4. **View Details**: Click on any bike to see full details
-5. **Sell Your Bike**: Click "Sell Bike" to create a listing (requires login)
-6. **Create Account**: Sign up to access all features
-7. **Dashboard**: Manage your listings and profile
-
-## Data Storage
-
-The website uses `localStorage` to store:
-- User accounts (`delhibikeshub_users`)
-- Bike listings (`delhibikeshub_bikes`)
-- Current user session (`delhibikeshub_currentUser`)
-
-All data persists across browser sessions.
-
-## Browser Compatibility
-
-Works on all modern browsers:
-- Chrome 60+
-- Firefox 60+
-- Safari 11+
-- Edge 79+
-
-## Project Structure
-
+```
 DelhiBikesHub/
-├── index.html # Homepage
-├── bikes.html # All Bikes Page
-├── details.html # Bike Details Page
-├── add.html # Add Bike Page
-├── login.html # Login Page
-├── signup.html # Signup Page
-├── dashboard.html # User Dashboard
-├── styles.css # Main CSS file
-├── script.js # Main JavaScript file
-└── README.md # This file
+├── client/                 ← React Frontend (Vite + Tailwind)
+│   ├── src/
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/          # Route pages
+│   │   ├── context/        # Auth & Bike context providers
+│   │   └── lib/            # API client & Supabase config
+│   ├── public/             # Static assets
+│   ├── index.html
+│   ├── vite.config.js
+│   └── package.json
+│
+├── server/                 ← Express API Backend
+│   ├── config/             # Supabase & Cloudinary config
+│   ├── middleware/          # Auth & upload middleware
+│   ├── routes/             # API route handlers
+│   ├── index.js            # Server entry point
+│   └── package.json
+│
+├── supabase/               ← Database schema
+│   └── schema.sql
+│
+├── package.json            ← Root workspace scripts
+└── README.md
+```
 
+---
 
-## Design Elements
+## 🚀 Quick Start
 
-- **Color Scheme**: Blue (#1E88E5), White, Light Grey
-- **Typography**: Clean, modern sans-serif fonts
-- **Layout**: Flexbox and CSS Grid for responsive design
-- **Animations**: Smooth hover effects and transitions
-- **Icons**: Font Awesome for consistent iconography
+### Prerequisites
 
-## JavaScript Functionality
+- Node.js 18+
+- npm 9+
+- [Supabase](https://supabase.com) account
+- [Cloudinary](https://cloudinary.com) account
 
-1. **Data Management**: CRUD operations for bikes and users
-2. **Filtering/Sorting**: Real-time filtering and sorting of bike listings
-3. **Form Validation**: Client-side validation for forms
-4. **Image Handling**: Image upload preview functionality
-5. **User Authentication**: Login/logout system with session management
-6. **Responsive Menu**: Mobile-friendly hamburger menu
+### 1. Clone & Install
 
-## Setup Instructions
+```bash
+git clone https://github.com/your-repo/DelhiBikesHub.git
+cd DelhiBikesHub
 
-1. Download all files to a folder
-2. Open `index.html` in a web browser
-3. No server or backend setup required
+# Install root workspace dependencies
+npm install
 
-## Sample Data
+# Install client & server dependencies
+npm run install:all
+```
 
-The website comes pre-loaded with sample data:
-- 6 sample bike listings
-- 2 sample user accounts
+### 2. Set Up Environment Variables
 
-**Test Credentials:**
-- Email: `rahul@example.com`, Password: `password123`
-- Email: `priya@example.com`, Password: `password123`
+**Frontend** — `client/.env`
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_API_URL=http://localhost:5000/api
+VITE_CLOUDINARY_CLOUD_NAME=your-cloud-name
+```
 
-## Features Implementation Details
+**Backend** — `server/.env`
+```env
+PORT=5000
+NODE_ENV=development
 
-### Bike Filtering
-- Filter by bike type (Bike/Scooty)
-- Filter by brand (Hero, Honda, Bajaj, etc.)
-- Filter by price range (slider and input fields)
-- Filter by Delhi localities (12+ areas)
-- Sort by newest, price low-high, price high-low
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
-### User Dashboard
-- View your listings
-- Edit/Delete listings
-- Update profile information
-- Account settings
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
 
-### Bike Details Page
-- Image gallery with thumbnail navigation
-- Complete bike specifications
-- Seller contact information
-- Similar bikes recommendation
+CLIENT_URL=http://localhost:5173
+```
 
-## Limitations
+### 3. Set Up Database
 
-1. **No Backend**: All data is stored locally in the browser
-2. **No Real Images**: Uses placeholder images
-3. **No Server Validation**: Form validation is client-side only
-4. **Single Browser**: Data doesn't sync across browsers/devices
+Run `supabase/schema.sql` in your Supabase SQL Editor to create tables, indexes, and RLS policies.
 
-## Future Enhancements
+### 4. Run Development
 
-1. Add backend with database for real data persistence
-2. Implement image upload to cloud storage
-3. Add search functionality with autocomplete
-4. Implement messaging system between buyers and sellers
-5. Add review and rating system
-6. Implement payment gateway integration
-7. Add email notifications
+```bash
+# Start both client and server simultaneously
+npm run dev
 
-## Credits
+# Or run them separately:
+npm run dev:client    # Frontend at http://localhost:5173
+npm run dev:server    # Backend at http://localhost:5000
+```
 
-- **Design**: Custom design for DelhiBikesHub
-- **Icons**: Font Awesome (v6.4.0)
-- **Colors**: Material Design Color Palette
-- **Development**: Pure HTML, CSS, JavaScript
+---
 
-## License
+## 📜 Available Scripts
 
-This project is for educational purposes. Feel free to use and modify.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start client + server concurrently |
+| `npm run dev:client` | Start Vite dev server only |
+| `npm run dev:server` | Start Express server only |
+| `npm run build` | Build frontend for production |
+| `npm run start` | Start production server |
+| `npm run install:all` | Install all dependencies |
+| `npm run lint` | Run ESLint on frontend |
+
+---
+
+## 🛡️ Security Features
+
+- **Helmet** — HTTP security headers
+- **CORS** — Configurable origin whitelist
+- **Rate Limiting** — General (100/15min) & auth-specific (20/15min)
+- **JWT Auth** — Supabase token verification
+- **RLS** — Row Level Security on all database tables
+- **Input Validation** — Server-side validation on all mutations
+- **Multer** — File type & size validation (5MB, JPEG/PNG/WebP only)
+
+---
+
+## 📱 Responsive Design
+
+Fully responsive across all breakpoints:
+
+| Breakpoint | Width | Target |
+|------------|-------|--------|
+| xs | 320px | Small phones |
+| sm | 640px | Large phones |
+| md | 768px | Tablets |
+| lg | 1024px | Laptops |
+| xl | 1280px | Desktops |
+| 2xl | 1536px | Large screens |
+
+Additional mobile features:
+- Touch swipe on image galleries
+- Safe area insets for notched devices
+- `prefers-reduced-motion` support
+- Minimum 44×44px tap targets
+- iOS input zoom prevention
+
+---
+
+## 🏗️ Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18, Vite 5, Tailwind CSS 3 |
+| Animations | Framer Motion |
+| Backend | Express.js 4 |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth (JWT) |
+| Images | Cloudinary + Multer |
+| Icons | Lucide React |
+
+---
+
+## 🚢 Deployment
+
+### Frontend → Vercel
+1. Connect your GitHub repo
+2. Set root directory to `client`
+3. Build command: `npm run build`
+4. Output directory: `dist`
+5. Add environment variables
+
+### Backend → Render / Railway
+1. Set root directory to `server`
+2. Start command: `node index.js`
+3. Add environment variables
+4. Set `CLIENT_URL` to your Vercel domain
+
+---
+
+## 👨‍💻 Author
+
+**Md Tanveer Alam**  
+[Portfolio](https://mdtanveeralamdev.vercel.app/) • [GitHub](https://github.com/mdtanveer0786)
+
+---
+
+## 📄 License
+
+This project is private and proprietary.

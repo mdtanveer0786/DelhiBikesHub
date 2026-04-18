@@ -1,309 +1,202 @@
-import React, { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, MapPin, Tag, Bike, ArrowRight, ShieldCheck, Zap, Heart, Star } from 'lucide-react';
+import { Search, Bike, ChevronRight, Zap, Star, ShieldCheck } from 'lucide-react';
 import { useBikes } from '../context/BikeContext';
-import BikeCard from '../components/BikeCard';
-import { motion } from 'framer-motion';
+
 
 const Home = () => {
   const { bikes } = useBikes();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useState({
-    brand: '',
-    model: '',
-    location: '',
-  });
+  const [activeTab, setActiveTab] = useState('brand');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const featuredBikes = bikes.filter(b => b.status !== 'sold').slice(0, 6);
+  const popularBikes = useMemo(() => bikes.filter(b => b.price < 100000).slice(0, 4), [bikes]);
+
+  const brands = [
+    { name: 'Hero', logo: 'https://v3h9g9n6.rocketcdn.me/wp-content/uploads/2021/01/Hero-Logo.png' },
+    { name: 'Honda', logo: 'https://v3h9g9n6.rocketcdn.me/wp-content/uploads/2021/01/Honda-Logo.png' },
+    { name: 'Bajaj', logo: 'https://v3h9g9n6.rocketcdn.me/wp-content/uploads/2021/01/Bajaj-Logo.png' },
+    { name: 'TVS', logo: 'https://v3h9g9n6.rocketcdn.me/wp-content/uploads/2021/01/TVS-Logo.png' },
+    { name: 'Yamaha', logo: 'https://v3h9g9n6.rocketcdn.me/wp-content/uploads/2021/01/Yamaha-Logo.png' },
+    { name: 'Suzuki', logo: 'https://v3h9g9n6.rocketcdn.me/wp-content/uploads/2021/01/Suzuki-Logo.png' },
+    { name: 'Royal Enfield', logo: 'https://v3h9g9n6.rocketcdn.me/wp-content/uploads/2021/01/Royal-Enfield-Logo.png' },
+    { name: 'KTM', logo: 'https://v3h9g9n6.rocketcdn.me/wp-content/uploads/2021/01/KTM-Logo.png' }
+  ];
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const params = new URLSearchParams();
-    if (searchParams.brand) params.append('brand', searchParams.brand);
-    if (searchParams.model) params.append('model', searchParams.model);
-    if (searchParams.location) params.append('location', searchParams.location);
-    navigate(`/bikes?${params.toString()}`);
+    if (searchTerm.trim()) {
+      navigate(`/bikes?model=${encodeURIComponent(searchTerm)}`);
+    }
   };
 
-  const localities = [
-    { name: 'Karol Bagh', icon: '🏪', count: '50+' },
-    { name: 'Lajpat Nagar', icon: '🛒', count: '45+' },
-    { name: 'Rohini', icon: '🏠', count: '60+' },
-    { name: 'Dwarka', icon: '🏙️', count: '55+' },
-    { name: 'Shahdara', icon: '🛣️', count: '40+' },
-    { name: 'Connaught Place', icon: '🏛️', count: '30+' },
-  ];
-
-  const brands = ['Hero', 'Honda', 'Bajaj', 'TVS', 'Yamaha', 'Suzuki', 'Royal Enfield'];
-  const locations = ['Karol Bagh', 'Lajpat Nagar', 'Rohini', 'Dwarka', 'Shahdara', 'Connaught Place', 'Pitampura', 'Janakpuri'];
-
-  const stats = [
-    { label: 'Active Listings', value: bikes.filter(b => b.status === 'active').length + '+', icon: Bike },
-    { label: 'Delhi Localities', value: '20+', icon: MapPin },
-    { label: 'Happy Buyers', value: '1000+', icon: Star },
-  ];
-
-  const trustBadges = [
-    {
-      icon: ShieldCheck,
-      title: 'Verified Listings',
-      desc: 'Genuine sellers and bikes',
-      iconBg: 'bg-fuchsia-50',
-      iconColor: 'text-fuchsia-600',
-    },
-    {
-      icon: Zap,
-      title: 'Instant Listing',
-      desc: 'Sell your bike in minutes',
-      iconBg: 'bg-blue-50',
-      iconColor: 'text-blue-600',
-    },
-    {
-      icon: Heart,
-      title: 'Trusted Community',
-      desc: 'Thousands of happy buyers',
-      iconBg: 'bg-rose-50',
-      iconColor: 'text-rose-600',
-    },
-  ];
-
   return (
-    <div className="space-y-10 sm:space-y-14 lg:space-y-20 pb-10 sm:pb-14 lg:pb-20">
-      {/* Hero Section */}
-      <section className="relative min-h-[420px] sm:min-h-[480px] lg:min-h-[600px] flex items-center justify-center overflow-hidden bg-slate-900">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/images/hero-bg.jpg"
-            alt=""
-            className="w-full h-full object-cover opacity-30"
-            aria-hidden="true"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-slate-900/30"></div>
-        </div>
+    <div className="bg-[#f0f2f5] min-h-screen font-sans pb-20">
+      <Helmet>
+        <title>DelhiBikesHub | New Bikes, Used Bikes, Prices & Reviews</title>
+      </Helmet>
 
-        {/* Animated gradient orbs */}
-        <div className="absolute top-20 left-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-10 right-10 w-64 sm:w-96 h-64 sm:h-96 bg-primary-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full py-10 sm:py-12">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-3 sm:mb-6 leading-tight">
-              Buy & Sell Used Bikes{' '}
-              <br className="hidden sm:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-300 to-primary-500">
-                & Scooties in Delhi
-              </span>
-            </h1>
-          </motion.div>
-
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.6 }}
-            className="text-sm sm:text-lg lg:text-xl text-slate-300 mb-6 sm:mb-10 max-w-2xl mx-auto px-2"
-          >
-            Find the best deals on pre-owned bikes and scooties across Delhi. 
-            Verified listings, honest prices.
-          </motion.p>
-
-          {/* Search Form */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="max-w-4xl mx-auto bg-white/10 backdrop-blur-md p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-white/20 shadow-2xl"
-          >
-            <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
-              <div className="relative group">
-                <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500" size={16} />
-                <select
-                  className="w-full pl-10 pr-4 py-3 sm:py-3.5 bg-white rounded-xl sm:rounded-2xl text-slate-900 appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500 font-medium text-sm"
-                  value={searchParams.brand}
-                  onChange={(e) => setSearchParams({ ...searchParams, brand: e.target.value })}
-                  aria-label="Select Brand"
-                >
-                  <option value="">Select Brand</option>
-                  {brands.map(brand => <option key={brand} value={brand}>{brand}</option>)}
-                </select>
-              </div>
-
-              <div className="relative group">
-                <Bike className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500" size={16} />
-                <input
-                  type="text"
-                  placeholder="e.g. Activa, Splendor"
-                  className="w-full pl-10 pr-4 py-3 sm:py-3.5 bg-white rounded-xl sm:rounded-2xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500 font-medium text-sm"
-                  value={searchParams.model}
-                  onChange={(e) => setSearchParams({ ...searchParams, model: e.target.value })}
-                  aria-label="Search by model"
-                />
-              </div>
-
-              <div className="relative group">
-                <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500" size={16} />
-                <select
-                  className="w-full pl-10 pr-4 py-3 sm:py-3.5 bg-white rounded-xl sm:rounded-2xl text-slate-900 appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500 font-medium text-sm"
-                  value={searchParams.location}
-                  onChange={(e) => setSearchParams({ ...searchParams, location: e.target.value })}
-                  aria-label="Select Locality"
-                >
-                  <option value="">Select Locality</option>
-                  {locations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
-                </select>
-              </div>
-
-              <button
-                type="submit"
-                className="bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl sm:rounded-2xl py-3 sm:py-3.5 px-6 font-bold text-sm hover:shadow-lg hover:shadow-primary-600/30 transition-all flex items-center justify-center space-x-2 active:scale-95"
-              >
-                <Search size={18} />
-                <span>Search</span>
-              </button>
-            </form>
-          </motion.div>
-
-          {/* Quick Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            className="flex justify-center gap-6 sm:gap-10 mt-6 sm:mt-10"
-          >
-            {stats.map((stat, i) => (
-              <div key={i} className="text-center">
-                <div className="text-lg sm:text-2xl font-black text-white">{stat.value}</div>
-                <div className="text-[9px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider mt-0.5">{stat.label}</div>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Trust Badges */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
-          {trustBadges.map(({ icon: Icon, title, desc, iconBg, iconColor }, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="flex items-center space-x-3 sm:space-x-4 p-4 sm:p-6 bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
-            >
-              <div className={`w-11 h-11 sm:w-14 sm:h-14 ${iconBg} rounded-xl sm:rounded-2xl flex items-center justify-center ${iconColor} shrink-0`}>
-                <Icon size={22} />
-              </div>
-              <div>
-                <h3 className="font-bold text-slate-900 text-sm sm:text-base">{title}</h3>
-                <p className="text-slate-500 text-xs sm:text-sm">{desc}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Popular Localities */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-end justify-between mb-5 sm:mb-10">
-          <div>
-            <h2 className="text-xl sm:text-3xl font-black text-slate-900">Popular Localities</h2>
-            <p className="text-slate-500 mt-1 sm:mt-2 text-xs sm:text-base">Find bikes in your preferred locality</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-4 lg:gap-6">
-          {localities.map((locality, i) => (
-            <motion.div
-              key={locality.name}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-            >
-              <Link
-                to={`/bikes?location=${encodeURIComponent(locality.name)}`}
-                className="block bg-white p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 text-center hover:shadow-lg hover:border-primary-200 transition-all group"
-              >
-                <span className="text-2xl sm:text-4xl mb-2 sm:mb-3 block group-hover:scale-110 transition-transform">
-                  {locality.icon}
-                </span>
-                <h3 className="font-bold text-slate-900 text-[11px] sm:text-sm">{locality.name}</h3>
-                <p className="text-primary-600 text-[10px] sm:text-xs font-bold mt-0.5 sm:mt-1">{locality.count}</p>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured Bikes */}
-      <section className="bg-slate-50 py-10 sm:py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-5 sm:mb-10">
+      {/* Hero / Search Section */}
+      <section className="bg-white pt-32 pb-16 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-xl sm:text-3xl font-black text-slate-900">Featured Listings</h2>
-              <p className="text-slate-500 mt-1 sm:mt-2 text-xs sm:text-base">Best deals on quality bikes in Delhi</p>
+              <h1 className="text-4xl lg:text-5xl font-extrabold text-[#24272c] leading-tight mb-6">
+                Find your right bike
+              </h1>
+              
+              <div className="market-search animate-fadeIn">
+                <div className="flex gap-8 border-b border-gray-100 mb-6">
+                  {['brand', 'budget'].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`pb-3 text-sm font-black uppercase tracking-wider transition-all ${activeTab === tab ? 'text-[#d32f2f] border-b-2 border-[#d32f2f]' : 'text-gray-400 hover:text-gray-600'}`}
+                    >
+                      By {tab}
+                    </button>
+                  ))}
+                </div>
+
+                <form onSubmit={handleSearch} className="space-y-4">
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                    <input
+                      type="text"
+                      placeholder={activeTab === 'brand' ? "Search for Brand or Model" : "Enter your budget (e.g. 1 Lakh)"}
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold focus:outline-none focus:border-[#d32f2f]/30 focus:ring-4 focus:ring-[#d32f2f]/5 transition-all"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <button type="submit" className="w-full btn-primary py-4 rounded-lg shadow-lg shadow-[#d32f2f]/20">
+                    SEARCH BIKES
+                  </button>
+                </form>
+              </div>
             </div>
-            <Link 
-              to="/bikes" 
-              className="hidden sm:flex items-center space-x-2 text-primary-600 font-bold hover:translate-x-1 transition-transform text-sm"
-            >
-              <span>View All</span>
-              <ArrowRight size={18} />
-            </Link>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {featuredBikes.map((bike, i) => (
-              <motion.div
-                key={bike.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-              >
-                <BikeCard bike={bike} />
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="sm:hidden mt-5 text-center">
-            <Link 
-              to="/bikes" 
-              className="inline-flex items-center space-x-2 text-primary-600 font-bold text-sm"
-            >
-              <span>View All Listings</span>
-              <ArrowRight size={18} />
-            </Link>
+            <div className="hidden lg:block">
+              <img 
+                src="https://stimg.cardekho.com/images/carexteriorimages/630x420/Hero/Splendor-Plus/10665/1689679169649/front-view-118.jpg" 
+                alt="New Bike" 
+                className="w-full rounded-2xl shadow-2xl"
+              />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-slate-900 rounded-2xl sm:rounded-[3rem] overflow-hidden relative p-6 sm:p-12 md:p-16 lg:p-20 text-center">
-          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-36 sm:w-72 lg:w-96 h-36 sm:h-72 lg:h-96 bg-primary-600/20 blur-3xl rounded-full"></div>
-          <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-36 sm:w-72 lg:w-96 h-36 sm:h-72 lg:h-96 bg-primary-400/10 blur-3xl rounded-full"></div>
-          
-          <div className="relative z-10">
-            <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-3 sm:mb-6">
-              Ready to Sell Your Bike?
-            </h2>
-            <p className="text-slate-400 text-xs sm:text-base lg:text-lg mb-6 sm:mb-12 max-w-2xl mx-auto">
-              Get the best price for your used bike or scooty. List on DelhiBikesHub 
-              and connect with genuine buyers across Delhi.
-            </p>
-            <Link
-              to="/add"
-              className="bg-white text-slate-900 px-6 sm:px-10 py-3.5 sm:py-5 rounded-xl sm:rounded-2xl font-black text-sm sm:text-lg lg:text-xl hover:bg-primary-500 hover:text-white transition-all shadow-xl active:scale-95 inline-block"
-            >
-              List Your Bike Now
+      {/* Top Brands Section */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex justify-between items-end mb-8">
+            <h2 className="section-title mb-0">Popular Brands</h2>
+            <Link to="/bikes" className="text-sm font-bold text-[#d32f2f] flex items-center gap-1 hover:underline">
+              View All Brands <ChevronRight size={16} />
             </Link>
           </div>
+          <div className="grid-cols-brand grid gap-6">
+            {brands.map((brand) => (
+              <Link 
+                key={brand.name} 
+                to={`/bikes?brand=${brand.name}`}
+                className="flex flex-col items-center gap-3 group"
+              >
+                <div className="brand-circle">
+                  <span className="font-black text-[10px] text-gray-400 group-hover:text-[#d32f2f]">{brand.name}</span>
+                </div>
+                <span className="text-xs font-bold text-gray-600 group-hover:text-[#24272c]">{brand.name}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Bikes Tabs */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-6">
+          <h2 className="section-title">The Most Searched Bikes</h2>
+          <div className="flex gap-4 mb-8 overflow-x-auto hide-scrollbar pb-2">
+            {['Popular', 'Upcoming', 'Latest'].map((c) => (
+              <button key={c} className={`px-6 py-2 rounded-full text-sm font-bold border transition-all ${c === 'Popular' ? 'bg-[#d32f2f] text-white border-[#d32f2f]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}>
+                {c} Bikes
+              </button>
+            ))}
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {popularBikes.map(bike => (
+              <div key={bike.id} className="market-card h-full flex flex-col">
+                <div className="relative h-48 overflow-hidden bg-gray-100">
+                  <img 
+                    src={bike.images?.[0]?.url || `/images/bike${(bike.id % 6) + 1}.jpg`} 
+                    alt={bike.model}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-3 left-3 bg-fuchsia-600 text-white text-[9px] font-black px-2 py-1 rounded">TRENDING</div>
+                </div>
+                <div className="p-4 flex flex-col flex-grow">
+                  <h3 className="font-bold text-[#24272c] mb-1">{bike.brand} {bike.model}</h3>
+                  <div className="text-lg font-extrabold text-[#24272c] mb-4">
+                    ₹{bike.price.toLocaleString()}
+                  </div>
+                  <Link to={`/details/${bike.id}`} className="mt-auto btn-outline text-center text-xs py-2.5">
+                    Check Offers
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Collections Ad */}
+      <section className="py-8 bg-blue-50/50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { title: 'Best Mileage Bikes', icon: Zap, color: 'text-yellow-600' },
+              { title: 'Electric Scooters', icon: Bike, color: 'text-green-600' },
+              { title: 'Certified Used', icon: ShieldCheck, color: 'text-blue-600' }
+            ].map((col, i) => (
+              <div key={i} className="bg-white p-6 rounded-xl flex items-center gap-4 shadow-sm hover:shadow-md transition-all cursor-pointer border border-blue-100/50">
+                <div className={`p-3 rounded-full bg-slate-50 ${col.color}`}>
+                  <col.icon size={24} />
+                </div>
+                <span className="font-extrabold text-sm text-slate-800">{col.title}</span>
+                <ChevronRight size={16} className="ml-auto text-slate-300" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trust & Stats */}
+      <section className="py-24 bg-white border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-red-50 text-[#d32f2f] rounded-full flex items-center justify-center mb-6">
+                <Star size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-[#24272c] mb-2">India&apos;s #1 Hub</h3>
+              <p className="text-sm text-gray-500 font-medium">Largest marketplace in Delhi NCR for premium pre-owned bikes.</p>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6">
+                <ShieldCheck size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-[#24272c] mb-2">Verified Sellers</h3>
+              <p className="text-sm text-gray-500 font-medium">Every seller is strictly verified to ensure 100% genuine listings.</p>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-6">
+                <Zap size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-[#24272c] mb-2">Instant Support</h3>
+              <p className="text-sm text-gray-500 font-medium">Dedicated support team to assist you in your buying/selling journey.</p>
+            </div>
         </div>
       </section>
     </div>

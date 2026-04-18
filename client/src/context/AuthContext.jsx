@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { authAPI } from '../lib/api';
 
@@ -40,7 +40,7 @@ const demoUsers = [
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isDemo, setIsDemo] = useState(!supabase);
+  const [isDemo] = useState(!supabase);
 
   // Initialize — check Supabase session or use demo mode
   useEffect(() => {
@@ -100,6 +100,12 @@ export const AuthProvider = ({ children }) => {
     try {
       if (supabase) {
         const { data } = await authAPI.login({ email, password });
+        if (data.session) {
+          await supabase.auth.setSession({
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token
+          });
+        }
         setCurrentUser(data.user);
         return { success: true };
       } else {
@@ -120,6 +126,12 @@ export const AuthProvider = ({ children }) => {
     try {
       if (supabase) {
         const { data } = await authAPI.signup(userData);
+        if (data.session) {
+          await supabase.auth.setSession({
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token
+          });
+        }
         setCurrentUser(data.user);
         return { success: true };
       } else {

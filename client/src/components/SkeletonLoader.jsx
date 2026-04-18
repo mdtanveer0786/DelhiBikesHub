@@ -1,4 +1,4 @@
-import React from 'react';
+// Skeleton loaders for DelhiBikesHub components
 
 // ─── Card Skeleton ─────────────────────────────────────
 export const CardSkeleton = () => (

@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useBikes } from '../context/BikeContext';
-import { adminAPI } from '../lib/api';
+import ConfirmModal from '../components/ConfirmModal';
 import { 
   Shield, Bike, Users, IndianRupee, Trash2, Search, 
   TrendingUp, Eye, CheckCircle, 
-  BarChart3, Loader2
+  BarChart3, ChevronRight, MoreVertical
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Admin = () => {
-  const { currentUser, isAdmin, isDemo } = useAuth();
+  const { currentUser, isDemo } = useAuth();
   const { bikes, deleteBike } = useBikes();
   const navigate = useNavigate();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [bikeToDelete, setBikeToDelete] = useState(null);
 
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Auth guard
   if (!currentUser) {
     navigate('/login');
     return null;
   }
 
-  // Derive stats from context
   const stats = {
     totalBikes: bikes.length,
     activeBikes: bikes.filter(b => !b.status || b.status === 'active').length,
@@ -37,10 +37,16 @@ const Admin = () => {
 
   const formatPrice = (price) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(price);
 
-  const handleDeleteBike = async (id) => {
-    if (window.confirm('Are you sure you want to delete this listing?')) {
-      await deleteBike(id);
+  const handleDeleteBike = async () => {
+    if (bikeToDelete) {
+      await deleteBike(bikeToDelete);
+      setBikeToDelete(null);
     }
+  };
+
+  const openDeleteModal = (id) => {
+    setBikeToDelete(id);
+    setIsDeleteModalOpen(true);
   };
 
   const filteredBikes = bikes.filter(bike => {
@@ -51,24 +57,23 @@ const Admin = () => {
   });
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: BarChart3 },
-    { id: 'listings', label: 'Listings', icon: Bike },
-    { id: 'users', label: 'Users', icon: Users },
+    { id: 'overview', label: 'Hub Intelligence', icon: BarChart3 },
+    { id: 'listings', label: 'Inventory Manager', icon: Bike },
+    { id: 'users', label: 'User Network', icon: Users },
   ];
 
   const statCards = [
-    { label: 'Total Listings', value: stats.totalBikes, icon: Bike, bg: 'bg-fuchsia-50', text: 'text-fuchsia-600', change: `+${stats.newBikesThisWeek} this week` },
-    { label: 'Total Users', value: stats.totalUsers, icon: Users, bg: 'bg-blue-50', text: 'text-blue-600', change: `+${stats.newUsersThisWeek} this week` },
-    { label: 'Active Listings', value: stats.activeBikes, icon: CheckCircle, bg: 'bg-green-50', text: 'text-green-600', change: `${Math.round((stats.activeBikes/(stats.totalBikes||1))*100)}% active` },
-    { label: 'Market Value', value: formatPrice(stats.totalValue), icon: IndianRupee, bg: 'bg-amber-50', text: 'text-amber-600', change: 'Total inventory' },
+    { label: 'Total Listings', value: stats.totalBikes, icon: Bike, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Active Network', value: stats.totalUsers, icon: Users, color: 'text-purple-600', bg: 'bg-purple-50' },
+    { label: 'Inventory Value', value: formatPrice(stats.totalValue), icon: IndianRupee, color: 'text-[#d32f2f]', bg: 'bg-red-50' },
+    { label: 'Verification rate', value: '100%', icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50' },
   ];
 
   const getStatusBadge = (status) => {
     const styles = {
-      active: 'bg-green-50 text-green-700 border-green-200',
-      sold: 'bg-red-50 text-red-700 border-red-200',
-      pending: 'bg-amber-50 text-amber-700 border-amber-200',
-      rejected: 'bg-slate-50 text-slate-700 border-slate-200',
+      active: 'bg-green-50 text-green-700 border-green-100',
+      sold: 'bg-red-50 text-red-700 border-red-100',
+      pending: 'bg-amber-50 text-amber-700 border-amber-100',
     };
     return styles[status] || styles.active;
   };
@@ -81,252 +86,199 @@ const Admin = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 lg:py-12">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-5 sm:mb-8 lg:mb-12">
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className="w-11 h-11 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
-            <Shield size={22} />
-          </div>
-          <div>
-            <h1 className="text-lg sm:text-2xl lg:text-3xl font-black text-slate-900">Admin Panel</h1>
-            <p className="text-slate-500 font-bold text-[11px] sm:text-sm">Platform management & analytics</p>
-          </div>
+    <div className="bg-[#f0f2f5] min-h-screen pt-24 lg:pt-32 pb-20">
+      <div className="max-w-7xl mx-auto px-6">
+        
+        {/* Institutional Admin Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+           <div>
+              <div className="flex items-center gap-3 mb-3">
+                 <div className="w-10 h-10 bg-[#24272c] text-white flex items-center justify-center rounded-lg shadow-lg">
+                    <Shield size={20} />
+                 </div>
+                 <span className="text-[10px] font-black uppercase text-gray-400 tracking-[0.3em]">System Administration</span>
+              </div>
+              <h1 className="text-3xl lg:text-4xl font-extrabold text-[#24272c] tracking-tight">Marketplace Intelligence</h1>
+           </div>
+           {isDemo && (
+             <div className="bg-amber-50 text-amber-700 border border-amber-100 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" /> Sandbox Mode
+             </div>
+           )}
         </div>
-        {isDemo && (
-          <div className="sm:ml-auto bg-amber-50 text-amber-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-amber-200 self-start">
-            Demo Mode
+
+        {/* Tab Navigation (Professional Pill Style) */}
+        <div className="flex bg-white p-1.5 rounded-xl border border-gray-100 shadow-sm mb-10 overflow-x-auto hide-scrollbar w-fit max-w-full">
+           {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap ${
+                  activeTab === tab.id ? 'bg-[#24272c] text-white shadow-lg' : 'text-gray-400 hover:text-[#24272c]'
+                }`}
+              >
+                <tab.icon size={16} /> {tab.label}
+              </button>
+           ))}
+        </div>
+
+        {/* Intelligence Overview */}
+        {activeTab === 'overview' && (
+          <div className="space-y-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+               {statCards.map((stat, i) => (
+                 <div key={i} className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden group">
+                    <div className={`w-12 h-12 ${stat.bg} ${stat.color} rounded-lg flex items-center justify-center mb-6`}>
+                       <stat.icon size={24} />
+                    </div>
+                    <div className="text-3xl font-black text-[#24272c] leading-none mb-2">{stat.value}</div>
+                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{stat.label}</div>
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-gray-50/50 rounded-full translate-x-12 -translate-y-12" />
+                 </div>
+               ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+               <div className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm">
+                  <h3 className="text-sm font-black text-[#24272c] uppercase tracking-widest mb-10 border-b border-gray-50 pb-4">Portfolio Distribution</h3>
+                  <div className="space-y-6">
+                    {Object.entries(stats.brandStats).sort((a,b) => b[1]-a[1]).slice(0, 6).map(([brand, count]) => (
+                      <div key={brand} className="flex items-center gap-4">
+                        <span className="w-24 text-[11px] font-black text-gray-400 uppercase truncate">{brand}</span>
+                        <div className="flex-grow h-2 bg-gray-50 rounded-full overflow-hidden">
+                           <div className="h-full bg-[#d32f2f]" style={{ width: `${(count/stats.totalBikes)*100}%` }} />
+                        </div>
+                        <span className="text-xs font-black text-[#24272c] w-6">{count}</span>
+                      </div>
+                    ))}
+                  </div>
+               </div>
+
+               <div className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
+                  <BarChart3 size={48} className="text-gray-100 mb-6" />
+                  <h3 className="text-lg font-bold text-[#24272c]">Growth Analytics</h3>
+                  <p className="text-gray-400 text-sm font-medium mt-2 max-w-xs">Connecting specialized BI systems for advanced volume-velocity mapping.</p>
+                  <button className="mt-8 text-[10px] font-black uppercase text-[#d32f2f] hover:underline uppercase tracking-widest flex items-center gap-2">
+                     Connect BI Suite <ChevronRight size={14} />
+                  </button>
+               </div>
+            </div>
           </div>
         )}
-      </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-slate-100 p-1 rounded-xl sm:rounded-2xl mb-5 sm:mb-8 overflow-x-auto no-scrollbar">
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-1.5 px-3 sm:px-5 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
-              activeTab === tab.id
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            <tab.icon size={15} />
-            {tab.label}
-          </button>
-        ))}
-      </div>
+        {/* Inventory Management Table */}
+        {activeTab === 'listings' && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+               <div className="relative flex-grow group">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#d32f2f]" size={18} />
+                  <input
+                    type="text" placeholder="Filter by brand, model, or locality..."
+                    className="w-full bg-white border border-gray-100 focus:border-[#d32f2f]/30 py-4 pl-12 pr-4 rounded-xl text-sm font-bold text-[#24272c] placeholder:text-gray-400 focus:ring-4 focus:ring-[#d32f2f]/5 transition-all outline-none shadow-sm"
+                    value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+               </div>
+               <div className="bg-white px-6 py-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-center text-xs font-black text-gray-500 uppercase tracking-widest">
+                  {filteredBikes.length} Records
+               </div>
+            </div>
 
-      {/* Overview Tab */}
-      {activeTab === 'overview' && (
-        <div className="space-y-5 sm:space-y-8">
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-6">
-            {statCards.map((stat, i) => (
-              <div key={i} className="bg-white p-3.5 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm">
-                <div className={`w-9 h-9 sm:w-12 sm:h-12 ${stat.bg} ${stat.text} rounded-lg sm:rounded-xl flex items-center justify-center mb-2.5 sm:mb-4`}>
-                  <stat.icon size={18} />
-                </div>
-                <div className="text-lg sm:text-2xl lg:text-3xl font-black text-slate-900">{stat.value}</div>
-                <div className="text-slate-400 font-bold text-[9px] sm:text-xs uppercase tracking-wider mt-0.5">{stat.label}</div>
-                <div className="text-[9px] sm:text-xs text-green-600 font-bold mt-1.5 sm:mt-2 flex items-center gap-1">
-                  <TrendingUp size={11} />
-                  {stat.change}
-                </div>
-              </div>
-            ))}
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+               <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                     <thead>
+                        <tr className="bg-gray-50 border-b border-gray-100">
+                           <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Listing Detail</th>
+                           <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Seller Profile</th>
+                           <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Asset Value</th>
+                           <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Market State</th>
+                           <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Control</th>
+                        </tr>
+                     </thead>
+                     <tbody className="divide-y divide-gray-50">
+                        {filteredBikes.map(bike => (
+                           <tr key={bike.id} className="hover:bg-gray-50/50 transition-colors">
+                              <td className="px-8 py-5 text-sm">
+                                 <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-50 border border-gray-100">
+                                       <img src={getImageUrl(bike)} className="w-full h-full object-cover" />
+                                    </div>
+                                    <div>
+                                       <div className="font-bold text-[#24272c]">{bike.brand} {bike.model}</div>
+                                       <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{bike.year} • {bike.locality}</div>
+                                    </div>
+                                 </div>
+                              </td>
+                              <td className="px-8 py-5 text-sm font-bold text-gray-500 uppercase tracking-tight text-xs">{bike.sellerName}</td>
+                              <td className="px-8 py-5 text-sm font-black text-[#d32f2f]">{formatPrice(bike.price)}</td>
+                              <td className="px-8 py-5">
+                                 <span className={`px-2.5 py-1 rounded text-[10px] font-black uppercase tracking-widest border ${getStatusBadge(bike.status || 'active')}`}>
+                                    {bike.status || 'active'}
+                                 </span>
+                              </td>
+                              <td className="px-8 py-5">
+                                 <div className="flex items-center gap-3 text-gray-400">
+                                    <Link to={`/details/${bike.id}`} className="hover:text-[#24272c] transition-colors"><Eye size={18} /></Link>
+                                    <button onClick={() => openDeleteModal(bike.id)} className="hover:text-red-600 transition-colors"><Trash2 size={18} /></button>
+                                 </div>
+                              </td>
+                           </tr>
+                        ))}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
           </div>
+        )}
 
-          {/* Brand & Type Distribution */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            <div className="bg-white p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm">
-              <h3 className="text-sm sm:text-base font-black text-slate-900 mb-3 sm:mb-6">By Brand</h3>
-              <div className="space-y-2.5 sm:space-y-3">
-                {Object.entries(stats.brandStats).sort((a, b) => b[1] - a[1]).map(([brand, count]) => (
-                  <div key={brand} className="flex items-center justify-between">
-                    <span className="text-xs sm:text-sm text-slate-600 font-medium">{brand}</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 sm:w-32 h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full"
-                          style={{ width: `${(count / (stats.totalBikes || 1)) * 100}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-xs font-bold text-slate-500 w-5 text-right">{count}</span>
-                    </div>
+        {/* User Management State */}
+        {activeTab === 'users' && (
+           <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="p-8 border-b border-gray-100 flex items-center justify-between">
+                 <div>
+                    <h2 className="text-xl font-black text-[#24272c] tracking-tight">Access Control</h2>
+                    <p className="text-sm font-medium text-gray-400 mt-1">Manage network authentication and merchant privileges.</p>
+                 </div>
+                 <button className="text-[10px] font-black uppercase text-[#d32f2f] tracking-widest bg-red-50 px-4 py-2 rounded-lg">Invite Merchant</button>
+              </div>
+              <div className="divide-y divide-gray-50">
+                {[
+                  { name: 'Rahul Sharma', email: 'rahul@example.com', role: 'Premium Merchant', ads: 1 },
+                  { name: 'Priya Singh', email: 'priya@example.com', role: 'Verified Seller', ads: 1 },
+                  { name: 'DelhiBikes Admin', email: 'admin@hub.com', role: 'Super Administrator', ads: 0 }
+                ].map((u, i) => (
+                  <div key={i} className="px-8 py-6 flex items-center justify-between hover:bg-gray-50/50 transition-all">
+                     <div className="flex items-center gap-5">
+                        <div className="w-12 h-12 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center font-black text-[#24272c]">
+                           {u.name.charAt(0)}
+                        </div>
+                        <div>
+                           <div className="font-bold text-[#24272c]">{u.name}</div>
+                           <div className="text-xs text-gray-400 font-medium">{u.email}</div>
+                        </div>
+                     </div>
+                     <div className="flex items-center gap-10">
+                        <div className="text-right">
+                           <div className="text-[10px] font-black text-[#24272c] uppercase tracking-widest">{u.role}</div>
+                           <div className="text-[11px] font-bold text-gray-400 uppercase tracking-tighter">{u.ads} active assets</div>
+                        </div>
+                        <button className="p-2 text-gray-300 hover:text-gray-600 transition-colors"><MoreVertical size={20} /></button>
+                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+           </div>
+        )}
+      </div>
 
-            <div className="bg-white p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm">
-              <h3 className="text-sm sm:text-base font-black text-slate-900 mb-3 sm:mb-6">By Type</h3>
-              <div className="flex gap-4 sm:gap-6 items-center justify-center h-28 sm:h-40">
-                {Object.entries(stats.typeStats).map(([type, count]) => {
-                  const pct = Math.round((count / (stats.totalBikes || 1)) * 100);
-                  return (
-                    <div key={type} className="text-center">
-                      <div className="relative w-16 h-16 sm:w-24 sm:h-24 mx-auto">
-                        <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
-                          <path
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                            fill="none" stroke="#f1f5f9" strokeWidth="3"
-                          />
-                          <path
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                            fill="none" stroke={type === 'Bike' ? '#d946ef' : '#3b82f6'} strokeWidth="3"
-                            strokeDasharray={`${pct}, 100`}
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-base sm:text-xl font-black text-slate-900">{pct}%</span>
-                        </div>
-                      </div>
-                      <span className="text-[10px] sm:text-xs font-bold text-slate-500 mt-1.5 sm:mt-2 block">{type} ({count})</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Listings Tab */}
-      {activeTab === 'listings' && (
-        <div className="space-y-4 sm:space-y-6">
-          <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-            <div className="relative flex-grow">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-              <input
-                type="text" placeholder="Search listings..."
-                className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <span className="text-xs font-bold text-slate-500">{filteredBikes.length} listings</span>
-          </div>
-
-          {/* Responsive Table / Cards */}
-          <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            {/* Desktop Table */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-slate-50">
-                    <th className="px-4 lg:px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Bike</th>
-                    <th className="px-4 lg:px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Seller</th>
-                    <th className="px-4 lg:px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Price</th>
-                    <th className="px-4 lg:px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                    <th className="px-4 lg:px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {filteredBikes.map(bike => (
-                    <tr key={bike.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-4 lg:px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 shrink-0">
-                            <img src={getImageUrl(bike)} alt="" className="w-full h-full object-cover" onError={(e) => { e.target.src = '/images/bike1.jpg'; }} />
-                          </div>
-                          <div>
-                            <div className="font-bold text-slate-900 text-sm">{bike.brand} {bike.model}</div>
-                            <div className="text-[10px] font-bold text-slate-400">{bike.locality} • {bike.year}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 lg:px-6 py-4">
-                        <div className="text-sm font-bold text-slate-600">{bike.sellerName}</div>
-                      </td>
-                      <td className="px-4 lg:px-6 py-4">
-                        <div className="text-sm font-black text-primary-600">{formatPrice(bike.price)}</div>
-                      </td>
-                      <td className="px-4 lg:px-6 py-4">
-                        <span className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase border ${getStatusBadge(bike.status || 'active')}`}>
-                          {bike.status || 'active'}
-                        </span>
-                      </td>
-                      <td className="px-4 lg:px-6 py-4">
-                        <div className="flex items-center gap-1">
-                          <a href={`/details/${bike.id}`} className="p-1.5 text-slate-300 hover:text-primary-500 transition-colors" aria-label="View listing">
-                            <Eye size={16} />
-                          </a>
-                          <button onClick={() => handleDeleteBike(bike.id)} className="p-1.5 text-slate-300 hover:text-red-500 transition-colors" aria-label="Delete listing">
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile Cards */}
-            <div className="md:hidden divide-y divide-slate-100">
-              {filteredBikes.map(bike => (
-                <div key={bike.id} className="p-3.5 sm:p-4 flex items-center gap-3">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-slate-100 shrink-0">
-                    <img src={getImageUrl(bike)} alt="" className="w-full h-full object-cover" onError={(e) => { e.target.src = '/images/bike1.jpg'; }} />
-                  </div>
-                  <div className="flex-grow min-w-0">
-                    <div className="font-bold text-slate-900 text-sm truncate">{bike.brand} {bike.model}</div>
-                    <div className="text-[11px] text-slate-500">{bike.sellerName} • {bike.locality}</div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm font-black text-primary-600">{formatPrice(bike.price)}</span>
-                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${getStatusBadge(bike.status || 'active')}`}>
-                        {bike.status || 'active'}
-                      </span>
-                    </div>
-                  </div>
-                  <button onClick={() => handleDeleteBike(bike.id)} className="p-2 text-slate-300 hover:text-red-500 transition-colors shrink-0" aria-label="Delete listing">
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Users Tab */}
-      {activeTab === 'users' && (
-        <div className="space-y-4 sm:space-y-6">
-          <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="p-4 sm:p-6 border-b border-slate-50">
-              <h2 className="text-sm sm:text-base font-black text-slate-900">Registered Users</h2>
-              <p className="text-xs text-slate-500 mt-1">
-                {isDemo ? 'Demo data — connect Supabase for real user management' : 'Manage platform users and roles'}
-              </p>
-            </div>
-
-            <div className="divide-y divide-slate-50">
-              {[
-                { name: 'Rahul Sharma', email: 'rahul@example.com', location: 'Karol Bagh', role: 'user', listings: 1 },
-                { name: 'Priya Singh', email: 'priya@example.com', location: 'Lajpat Nagar', role: 'user', listings: 1 },
-                { name: 'Admin User', email: 'admin@delhibikeshub.com', location: 'Delhi', role: 'admin', listings: 0 },
-              ].map((user, i) => (
-                <div key={i} className="p-3.5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center text-white font-black text-sm shrink-0">
-                    {user.name.charAt(0)}
-                  </div>
-                  <div className="flex-grow min-w-0">
-                    <div className="font-bold text-slate-900 text-sm">{user.name}</div>
-                    <div className="text-xs text-slate-500">{user.email}</div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">{user.location} • {user.listings} listings</div>
-                  </div>
-                  <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase border self-start sm:self-auto ${
-                    user.role === 'admin' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-50 text-slate-600 border-slate-200'
-                  }`}>
-                    {user.role}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteBike}
+        title="Admin: Execute Asset Deletion?"
+        message="This control action will permanently scrub this listing data from the marketplace hub. It cannot be reverted."
+        confirmText="Confirm Removal"
+      />
     </div>
   );
 };

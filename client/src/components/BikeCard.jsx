@@ -1,9 +1,10 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Calendar, Gauge } from 'lucide-react';
+import { MapPin, Calendar, Gauge, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const BikeCard = ({ bike }) => {
-  // Use uploaded Cloudinary images, fallback to static placeholders
+  if (!bike) return null;
+
   const getImageUrl = () => {
     if (bike.images && bike.images.length > 0) {
       return typeof bike.images[0] === 'string' ? bike.images[0] : bike.images[0].url || bike.images[0];
@@ -11,8 +12,6 @@ const BikeCard = ({ bike }) => {
     const imageNum = (typeof bike.id === 'number' ? bike.id % 6 : 0) + 1;
     return `/images/bike${imageNum}.jpg`;
   };
-
-  const imageUrl = getImageUrl();
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-IN', {
@@ -23,60 +22,66 @@ const BikeCard = ({ bike }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 group flex flex-col">
-      <div className="relative h-40 xs:h-44 sm:h-48 overflow-hidden">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="market-card group cursor-pointer h-full flex flex-col"
+    >
+      {/* Product Image Area */}
+      <div className="relative h-44 sm:h-52 overflow-hidden bg-gray-100">
         <img
-          src={imageUrl}
+          src={getImageUrl()}
           alt={`${bike.brand} ${bike.model}`}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
-          onError={(e) => { e.target.src = '/images/bike1.jpg'; }}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 bg-white/90 backdrop-blur-sm px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-[11px] font-black text-primary-600 shadow-sm uppercase tracking-wide">
-          {bike.type}
-        </div>
         {bike.status === 'sold' && (
-          <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center">
-            <span className="bg-red-500 text-white px-4 py-2 rounded-xl font-black text-sm">SOLD</span>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
+            <span className="bg-red-600 text-white font-black px-4 py-1.5 rounded-full text-[10px] tracking-widest uppercase">SOLD OUT</span>
           </div>
         )}
+        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold text-gray-600 shadow-sm flex items-center gap-1">
+          <Star size={10} className="text-yellow-500 fill-yellow-500" /> 4.2
+        </div>
       </div>
-      
-      <div className="p-3.5 sm:p-4 md:p-5 flex flex-col flex-grow">
-        <h3 className="text-sm sm:text-base md:text-lg font-bold text-slate-900 mb-1.5 sm:mb-2 truncate">
-          {bike.brand} {bike.model}
-        </h3>
-        
-        <div className="flex items-center gap-2.5 sm:gap-3 md:gap-4 text-slate-500 text-[11px] sm:text-xs md:text-sm mb-2.5 sm:mb-3">
-          <div className="flex items-center gap-1">
-            <Gauge size={12} className="text-slate-400 shrink-0" />
-            <span>{Number(bike.km).toLocaleString('en-IN')} km</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Calendar size={12} className="text-slate-400 shrink-0" />
-            <span>{bike.year}</span>
-          </div>
+
+      {/* Product Info Area */}
+      <div className="p-4 flex flex-col flex-grow">
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="text-base font-bold text-[#24272c] line-clamp-1">
+            {bike.brand} {bike.model}
+          </h3>
         </div>
         
-        <div className="flex items-center justify-between mt-auto pt-1.5 sm:pt-2">
-          <div className="text-base sm:text-lg md:text-xl font-black text-primary-600">
-            {formatPrice(bike.price)}
+        <div className="text-xl font-extrabold text-[#24272c] mb-4">
+          {formatPrice(bike.price)}
+          <span className="text-[10px] font-bold text-gray-400 ml-1.5 uppercase tracking-tighter">* On-road Price</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 mb-5 border-t border-gray-100 pt-4">
+          <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-500">
+            <Gauge size={14} className="text-gray-400" />
+            {Number(bike.km).toLocaleString()} km
           </div>
-          <div className="flex items-center gap-1 text-slate-400 text-[10px] sm:text-[11px] md:text-xs">
-            <MapPin size={10} className="shrink-0" />
-            <span className="truncate max-w-[70px] sm:max-w-[80px]">{bike.locality}</span>
+          <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-500">
+            <Calendar size={14} className="text-gray-400" />
+            {bike.year}
+          </div>
+          <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-500 col-span-2">
+            <MapPin size={14} className="text-gray-400" />
+            {bike.locality}
           </div>
         </div>
-        
-        <Link
-          to={`/details/${bike.id}`}
-          className="mt-3 sm:mt-4 block w-full text-center py-2.5 sm:py-3 bg-slate-900 text-white rounded-xl font-bold text-xs sm:text-sm hover:bg-primary-600 transition-colors shadow-sm active:scale-[0.98]"
-        >
-          View Details
-        </Link>
+
+        <div className="mt-auto pt-2">
+            <Link
+              to={`/details/${bike.id}`}
+              className="w-full btn-outline text-center text-xs py-2.5 flex items-center justify-center group-hover:bg-[#d32f2f] group-hover:text-white group-hover:border-[#d32f2f] transition-all"
+            >
+              Check Offers
+            </Link>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,32 +1,34 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { Bike, Facebook, Twitter, Instagram, Mail, Phone, MapPin } from 'lucide-react';
+import { Bike, Facebook, Twitter, Instagram, Mail, ChevronRight, Phone, MapPin } from 'lucide-react';
 
 const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-slate-900 text-slate-300 pt-12 sm:pt-16 pb-6 sm:pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mb-10 sm:mb-12">
+    <footer className="bg-white border-t border-gray-100 pt-16 pb-8">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+          
           {/* Brand Info */}
-          <div className="col-span-2 sm:col-span-2 lg:col-span-1 space-y-5">
-            <Link to="/" className="flex items-center space-x-2 group">
-              <div className="w-9 h-9 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center text-white">
-                <Bike size={20} />
+          <div className="space-y-6">
+            <Link to="/" className="flex items-center gap-2.5 group">
+              <div className="w-10 h-10 bg-[#d32f2f] flex items-center justify-center text-white rounded-lg shadow-lg">
+                <Bike size={24} strokeWidth={2.5} />
               </div>
-              <span className="text-xl font-black text-white">
-                Delhi<span className="text-primary-400">Bikes</span>Hub
-              </span>
+              <div className="flex flex-col">
+                <span className="text-xl font-black text-[#24272c] tracking-tighter leading-none">
+                  DELHI<span className="text-[#d32f2f]">BIKES</span>
+                </span>
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mt-0.5">Marketplace</span>
+              </div>
             </Link>
-            <p className="text-slate-400 leading-relaxed text-sm">
-              Delhi's trusted marketplace for buying and selling used bikes and scooties.
-              Connecting buyers and sellers across Delhi.
+            <p className="text-sm text-gray-500 font-medium leading-relaxed">
+              India&apos;s most trusted marketplace for pre-owned two-wheelers. We facilitate direct connections between verified buyers and sellers in Delhi NCR.
             </p>
-            <div className="flex space-x-3">
+            <div className="flex gap-4">
               {[Facebook, Twitter, Instagram].map((Icon, i) => (
-                <a key={i} href="#" className="w-9 h-9 bg-slate-800 hover:bg-primary-600 rounded-xl flex items-center justify-center transition-all" aria-label="Social media">
-                  <Icon size={16} />
+                <a key={i} href="#" className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:bg-[#d32f2f] hover:text-white transition-all shadow-sm">
+                  <Icon size={18} />
                 </a>
               ))}
             </div>
@@ -34,65 +36,80 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-white text-sm font-black uppercase tracking-wider mb-4 sm:mb-6">Quick Links</h3>
-            <ul className="space-y-2 sm:space-y-3">
+            <h3 className="text-sm font-black text-[#24272c] uppercase tracking-wider mb-6">Marketplace</h3>
+            <ul className="space-y-4">
               {[
-                { to: '/', label: 'Home' },
-                { to: '/bikes', label: 'All Bikes' },
-                { to: '/add', label: 'Sell Bike' },
-                { to: '/dashboard', label: 'Dashboard' },
+                { to: '/bikes', label: 'Buy New Bike' },
+                { to: '/bikes', label: 'Used Bikes' },
+                { to: '/add', label: 'Sell Your Bike' },
+                { to: '/bikes?brand=Hero', label: 'Hero Bikes' },
+                { to: '/bikes?brand=Honda', label: 'Honda Bikes' }
               ].map(link => (
-                <li key={link.to}>
-                  <Link to={link.to} className="text-sm hover:text-primary-400 transition-colors">
-                    {link.label}
+                <li key={link.label}>
+                  <Link to={link.to} className="text-sm font-bold text-gray-500 hover:text-[#d32f2f] transition-colors flex items-center gap-1">
+                    <ChevronRight size={14} className="text-gray-300" /> {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Localities */}
+          {/* Support */}
           <div>
-            <h3 className="text-white text-sm font-black uppercase tracking-wider mb-4 sm:mb-6">Localities</h3>
-            <ul className="space-y-2 sm:space-y-3">
-              {['Karol Bagh', 'Lajpat Nagar', 'Rohini', 'Dwarka'].map(loc => (
-                <li key={loc}>
-                  <Link to={`/bikes?location=${encodeURIComponent(loc)}`} className="text-sm hover:text-primary-400 transition-colors">
-                    {loc}
+            <h3 className="text-sm font-black text-[#24272c] uppercase tracking-wider mb-6">Support</h3>
+            <ul className="space-y-4">
+              {[
+                { to: '/about', label: 'About Us' },
+                { to: '/contact', label: 'Contact Support' },
+                { to: '/privacy', label: 'Privacy Policy' },
+                { to: '/terms', label: 'Terms of Use' }
+              ].map(link => (
+                <li key={link.label}>
+                  <Link to={link.to} className="text-sm font-bold text-gray-500 hover:text-[#d32f2f] transition-colors flex items-center gap-1">
+                    <ChevronRight size={14} className="text-gray-300" /> {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Contact */}
-          <div className="col-span-2 sm:col-span-1">
-            <h3 className="text-white text-sm font-black uppercase tracking-wider mb-4 sm:mb-6">Contact</h3>
-            <ul className="space-y-3">
-              <li className="flex items-start space-x-3 text-sm">
-                <MapPin size={16} className="text-primary-400 shrink-0 mt-0.5" />
-                <span>Delhi, India</span>
+          {/* Contact Info */}
+          <div>
+            <h3 className="text-sm font-black text-[#24272c] uppercase tracking-wider mb-6">Contact Us</h3>
+            <ul className="space-y-4">
+              <li className="flex items-start gap-3">
+                <MapPin size={18} className="text-[#d32f2f] shrink-0" />
+                <span className="text-sm font-bold text-gray-500">123, Karol Bagh, Near Metro Pillar, New Delhi - 110005</span>
               </li>
-              <li className="flex items-center space-x-3 text-sm">
-                <Phone size={16} className="text-primary-400 shrink-0" />
-                <span>+91 8252574286</span>
+              <li className="flex items-center gap-3">
+                <Phone size={18} className="text-[#d32f2f] shrink-0" />
+                <span className="text-sm font-bold text-gray-500">+91 99999 99999</span>
               </li>
-              <li className="flex items-center space-x-3 text-sm">
-                <Mail size={16} className="text-primary-400 shrink-0" />
-                <span className="break-all">info@delhibikeshub.com</span>
+              <li className="flex items-center gap-3">
+                <Mail size={18} className="text-[#d32f2f] shrink-0" />
+                <span className="text-sm font-bold text-gray-500">hello@delhibikeshub.com</span>
               </li>
             </ul>
           </div>
+
         </div>
 
-        <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-500">
-          <p>&copy; {year} DelhiBikesHub. All rights reserved.</p>
-          <p>
-            Developed by{' '}
-            <a href="https://mdtanveeralamdev.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:underline font-bold">
+        {/* Footer Bottom */}
+        <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
+            &copy; {year} DelhiBikesHub Marketplace. All Rights Reserved.
+          </p>
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] font-black uppercase text-gray-300 tracking-tighter">Developed by</span>
+            <a 
+              href="https://mdtanveeralamdev.vercel.app/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-[10px] font-black uppercase text-gray-500 hover:text-[#d32f2f] transition-colors"
+            >
               Md Tanveer Alam
             </a>
-          </p>
+          </div>
         </div>
       </div>
     </footer>

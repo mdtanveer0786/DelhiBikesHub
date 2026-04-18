@@ -1,248 +1,188 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Bike, Menu, X, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { Bike, Search, Menu, X, LogOut, LayoutDashboard, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const { currentUser, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const menuRef = useRef(null);
-  const toggleRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // Close mobile menu on route change
   useEffect(() => {
-    setIsOpen(false);
-  }, [location.pathname]);
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  // Close menu on Escape key
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false);
-        toggleRef.current?.focus();
-      }
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen]);
-
-  // Lock body scroll when mobile menu is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/bikes?model=${encodeURIComponent(searchTerm)}`);
+      setSearchTerm('');
     }
-    return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
-
-  const handleLogout = () => {
-    logout();
-    setIsOpen(false);
-    navigate('/');
   };
 
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'All Bikes', path: '/bikes' },
+    { name: 'New Bikes', path: '/bikes' },
+    { name: 'Used Bikes', path: '/bikes' },
     { name: 'Sell Bike', path: '/add' },
+    { name: 'Localities', path: '/#hubs' },
   ];
 
-  const isActive = (path) => location.pathname === path;
-
   return (
-    <nav className="bg-white/80 backdrop-blur-xl shadow-sm border-b border-slate-100 sticky top-0 z-50" role="navigation" aria-label="Main navigation">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 sm:h-18">
-          {/* Logo */}
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2 group" onClick={() => setIsOpen(false)}>
-              <div className="w-9 h-9 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-500/20 group-hover:shadow-primary-500/40 transition-shadow">
-                <Bike size={20} />
-              </div>
-              <span className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                Delhi<span className="text-primary-600">Bikes</span>Hub
-              </span>
-            </Link>
+    <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md' : 'bg-white border-b border-gray-100'}`}>
+      {/* Top Utility Bar (Secondary) */}
+      <div className="hidden lg:block bg-gray-50 border-b border-gray-100 py-1.5">
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+          <div className="flex gap-6">
+            <span>Verified Listings</span>
+            <span>Zero Commission</span>
+            <span>Direct Connection</span>
           </div>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 ${
-                  isActive(link.path)
-                    ? 'text-primary-600 bg-primary-50'
-                    : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
-
-            {isAdmin && (
-              <Link
-                to="/admin"
-                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                  isActive('/admin')
-                    ? 'text-amber-600 bg-amber-50'
-                    : 'text-slate-600 hover:text-amber-600 hover:bg-amber-50'
-                }`}
-              >
-                <Shield size={16} />
-                Admin
-              </Link>
-            )}
-
-            <div className="w-px h-6 bg-slate-200 mx-2"></div>
-
-            {currentUser ? (
-              <div className="flex items-center space-x-2">
-                <Link
-                  to="/dashboard"
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 ${
-                    isActive('/dashboard')
-                      ? 'text-primary-600 bg-primary-50'
-                      : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="w-7 h-7 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center text-white text-xs font-black">
-                    {currentUser.name?.charAt(0).toUpperCase()}
-                  </div>
-                  <span className="hidden lg:inline">{currentUser.name?.split(' ')[0]}</span>
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                  title="Logout"
-                  aria-label="Logout"
-                >
-                  <LogOut size={18} />
-                </button>
-              </div>
-            ) : (
-              <Link
-                to="/login"
-                className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-primary-500/25 transition-all active:scale-95"
-              >
-                Login
-              </Link>
-            )}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
-            <button
-              ref={toggleRef}
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-xl transition-all"
-              aria-label={isOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={isOpen}
-              aria-controls="mobile-menu"
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+          <div className="flex gap-6">
+            <Link to="/contact" className="hover:text-primary-red transition-colors">Support</Link>
+            <Link to="/about" className="hover:text-primary-red transition-colors">About Hub</Link>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      <nav className="max-w-7xl mx-auto px-4 lg:px-6 h-16 lg:h-20 flex items-center justify-between gap-8">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
+          <div className="w-10 h-10 bg-[#d32f2f] flex items-center justify-center text-white rounded-lg shadow-lg group-hover:scale-105 transition-transform">
+            <Bike size={24} strokeWidth={2.5} />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xl font-black text-[#24272c] tracking-tighter leading-none">
+              DELHI<span className="text-[#d32f2f]">BIKES</span>
+            </span>
+            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mt-0.5">Marketplace</span>
+          </div>
+        </Link>
+
+        {/* Categories (Desktop) */}
+        <div className="hidden lg:flex items-center gap-8 h-full shrink-0">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.name}
+              to={link.path}
+              className={`text-sm font-bold uppercase tracking-wider h-full flex items-center border-b-2 transition-all ${location.pathname === link.path ? 'border-[#d32f2f] text-[#24272c]' : 'border-transparent text-gray-500 hover:text-[#d32f2f]'}`}
+            >
+              {link.name}
+            </Link>
+          ))}
+        </div>
+
+        {/* Global Search Box (Desktop) */}
+        <div className="hidden lg:flex flex-grow max-w-xl">
+           <form onSubmit={handleSearch} className="w-full relative group">
+              <input
+                type="text"
+                placeholder="Search brands, models or localities..."
+                className="w-full bg-gray-100 border-transparent focus:bg-white focus:border-[#d32f2f]/30 py-2.5 pl-12 pr-4 rounded-lg text-sm font-bold text-[#24272c] placeholder:text-gray-400 focus:ring-4 focus:ring-[#d32f2f]/5 transition-all outline-none"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#d32f2f]" size={18} />
+           </form>
+        </div>
+
+        {/* User Actions */}
+        <div className="flex items-center gap-4 shrink-0">
+          {currentUser ? (
+            <div className="flex items-center gap-3">
+              <Link to="/dashboard" className="hidden sm:flex items-center gap-2 text-sm font-black uppercase text-gray-500 hover:text-[#d32f2f] transition-colors tracking-tight">
+                <LayoutDashboard size={16} />
+                <span>Account</span>
+              </Link>
+              {isAdmin && (
+                <Link to="/admin" className="hidden sm:flex items-center gap-2 text-sm font-black uppercase text-amber-600 hover:text-amber-700 transition-colors tracking-tight">
+                  <Shield size={16} />
+                  <span>Admin</span>
+                </Link>
+              )}
+              <button 
+                onClick={logout}
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-[#d32f2f] transition-all"
+                title="Sign Out"
+              >
+                <LogOut size={20} />
+              </button>
+            </div>
+          ) : (
+            <Link to="/login" className="btn-primary text-[10px] sm:text-xs">
+              SIGN IN
+            </Link>
+          )}
+
+          {/* Mobile Menu Toggle */}
+          <button 
+            className="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile Sidebar */}
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop overlay */}
-            <motion.div
+            <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="fixed inset-0 top-16 bg-black/20 z-40 md:hidden"
               onClick={() => setIsOpen(false)}
-              aria-hidden="true"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm lg:hidden"
             />
-            <motion.div
-              id="mobile-menu"
-              ref={menuRef}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
-              className="md:hidden bg-white border-t border-slate-100 overflow-hidden relative z-50"
-              role="menu"
+            <motion.div 
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              className="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-[60] p-8 lg:hidden"
             >
-              <div className="px-4 py-4 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto pb-safe">
+              <div className="flex justify-between items-center mb-10">
+                <span className="text-xl font-black text-[#24272c]">MENU</span>
+                <button onClick={() => setIsOpen(false)}><X size={24} /></button>
+              </div>
+
+              <div className="flex flex-col gap-6">
                 {navLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    to={link.path}
+                  <Link 
+                    key={link.name} 
+                    to={link.path} 
                     onClick={() => setIsOpen(false)}
-                    className={`block px-4 py-3 rounded-xl text-base font-bold transition-all ${
-                      isActive(link.path)
-                        ? 'text-primary-600 bg-primary-50'
-                        : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
-                    }`}
-                    role="menuitem"
+                    className="text-lg font-bold text-gray-500 hover:text-[#d32f2f] transition-colors"
                   >
                     {link.name}
                   </Link>
                 ))}
-
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-2 px-4 py-3 rounded-xl text-base font-bold transition-all ${
-                      isActive('/admin')
-                        ? 'text-amber-600 bg-amber-50'
-                        : 'text-slate-600 hover:text-amber-600 hover:bg-amber-50'
-                    }`}
-                    role="menuitem"
-                  >
-                    <Shield size={18} />
-                    Admin Panel
-                  </Link>
-                )}
-
-                <div className="h-px bg-slate-100 my-3"></div>
-
+                <hr className="border-gray-100" />
                 {currentUser ? (
                   <>
-                    <Link
-                      to="/dashboard"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-bold text-slate-600 hover:text-primary-600 hover:bg-slate-50 transition-all"
-                      role="menuitem"
-                    >
-                      <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center text-white text-sm font-black">
-                        {currentUser.name?.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <div className="text-sm">{currentUser.name}</div>
-                        <div className="text-xs text-slate-400 font-medium">{currentUser.email}</div>
-                      </div>
+                    <Link to="/dashboard" onClick={() => setIsOpen(false)} className="flex items-center gap-3 text-lg font-bold text-gray-500">
+                      <LayoutDashboard size={20} />
+                      My Dashboard
                     </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left flex items-center gap-2 px-4 py-3 rounded-xl text-base font-bold text-red-500 hover:bg-red-50 transition-all"
-                      role="menuitem"
-                    >
-                      <LogOut size={18} />
-                      Logout
+                    {isAdmin && (
+                      <Link to="/admin" onClick={() => setIsOpen(false)} className="flex items-center gap-3 text-lg font-bold text-amber-600">
+                        <Shield size={20} />
+                        Admin Panel
+                      </Link>
+                    )}
+                    <button onClick={() => { logout(); setIsOpen(false); }} className="flex items-center gap-3 text-lg font-bold text-red-500">
+                      <LogOut size={20} />
+                      Log Out
                     </button>
                   </>
                 ) : (
-                  <Link
-                    to="/login"
-                    onClick={() => setIsOpen(false)}
-                    className="block text-center px-4 py-3.5 rounded-xl text-base font-bold bg-gradient-to-r from-primary-600 to-primary-700 text-white mt-2"
-                    role="menuitem"
-                  >
-                    Login / Sign Up
+                  <Link to="/login" onClick={() => setIsOpen(false)} className="btn-primary">
+                    SIGN IN NOW
                   </Link>
                 )}
               </div>
@@ -250,7 +190,7 @@ const Navbar = () => {
           </>
         )}
       </AnimatePresence>
-    </nav>
+    </header>
   );
 };
 

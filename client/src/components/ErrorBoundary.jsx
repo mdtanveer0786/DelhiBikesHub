@@ -38,7 +38,7 @@ class ErrorBoundary extends React.Component {
               Something Went Wrong
             </h1>
             <p className="text-slate-500 text-sm sm:text-base mb-8 leading-relaxed">
-              We hit an unexpected error. Don't worry — your data is safe. 
+              We hit an unexpected error. Don&apos;t worry — your data is safe. 
               Try refreshing or head back to the homepage.
             </p>
 

@@ -1,13 +1,16 @@
-import React from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useBikes } from '../context/BikeContext';
-import { User, Mail, Phone, MapPin, Calendar, Plus, Trash2, Edit, Bike, ShieldCheck, Eye } from 'lucide-react';
+import { Mail, Phone, MapPin, Calendar, Plus, Trash2, Bike, ShieldCheck, Eye, ChevronRight } from 'lucide-react';
+import ConfirmModal from '../components/ConfirmModal';
 
 const Dashboard = () => {
   const { currentUser } = useAuth();
   const { bikes, deleteBike } = useBikes();
   const navigate = useNavigate();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [bikeToDelete, setBikeToDelete] = useState(null);
 
   if (!currentUser) {
     navigate('/login');
@@ -19,7 +22,6 @@ const Dashboard = () => {
   );
 
   const formatPrice = (price) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(price);
-
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
 
   const getImageUrl = (bike) => {
@@ -29,141 +31,142 @@ const Dashboard = () => {
     return `/images/bike${((typeof bike.id === 'number' ? bike.id : 1) % 6) + 1}.jpg`;
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this listing?')) {
-      await deleteBike(id);
+  const handleDelete = async () => {
+    if (bikeToDelete) {
+      await deleteBike(bikeToDelete);
+      setBikeToDelete(null);
     }
   };
 
+  const openDeleteModal = (id) => {
+    setBikeToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-10">
-        {/* Profile Sidebar */}
-        <div className="lg:col-span-1">
-          <div className="bg-white p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-[2.5rem] border border-slate-100 shadow-sm text-center relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-20 sm:h-24 bg-gradient-to-r from-primary-500 to-primary-700"></div>
-            <div className="relative z-10 pt-2 sm:pt-4">
-              <div className="w-18 h-18 sm:w-24 sm:h-24 bg-white rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto shadow-xl border-4 border-white mb-3 sm:mb-4">
-                <div className="w-full h-full bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl sm:rounded-2xl flex items-center justify-center text-white text-2xl sm:text-3xl font-black">
-                  {currentUser.name?.charAt(0).toUpperCase()}
+    <div className="bg-[#f0f2f5] min-h-screen pt-24 lg:pt-32 pb-20">
+      <div className="max-w-7xl mx-auto px-6">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          
+          {/* User Profile Card (Sticky) */}
+          <aside className="lg:col-span-4">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden sticky top-32">
+              <div className="h-24 bg-[#d32f2f]/5 border-b border-gray-50 flex items-center px-8">
+                 <div className="bg-white px-3 py-1 rounded-full text-[10px] font-black uppercase text-[#d32f2f] border border-[#d32f2f]/20">
+                    Merchant Profile
+                 </div>
+              </div>
+              <div className="px-8 pb-10 -mt-10">
+                <div className="w-20 h-20 bg-white border-4 border-white shadow-lg rounded-2xl flex items-center justify-center text-2xl font-black text-[#d32f2f] mb-6 overflow-hidden">
+                   {currentUser.profileImage ? (
+                     <img src={currentUser.profileImage} className="w-full h-full object-cover" />
+                   ) : currentUser.name?.charAt(0).toUpperCase()}
+                </div>
+                
+                <h2 className="text-2xl font-black text-[#24272c] tracking-tight">{currentUser.name}</h2>
+                <div className="flex items-center gap-2 text-xs font-bold text-gray-400 mt-1">
+                   <ShieldCheck size={14} className="text-[#d32f2f]" /> Verified Member Since 2026
+                </div>
+
+                <div className="mt-10 space-y-4">
+                   {[
+                     { icon: Mail, value: currentUser.email, label: 'Email' },
+                     { icon: Phone, value: currentUser.phone, label: 'Mobile' },
+                     { icon: MapPin, value: currentUser.location, label: 'Location' },
+                     { icon: Calendar, value: `Joined ${formatDate(currentUser.created_at || currentUser.joinDate)}`, label: 'Member' },
+                   ].filter(i => i.value).map((item, idx) => (
+                     <div key={idx} className="flex items-start gap-4 p-3 bg-gray-50 rounded-xl border border-transparent hover:border-gray-200 transition-colors">
+                        <item.icon size={16} className="text-gray-400 mt-0.5" />
+                        <div className="flex-grow min-w-0">
+                           <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">{item.label}</div>
+                           <div className="text-sm font-bold text-[#24272c] truncate">{item.value}</div>
+                        </div>
+                     </div>
+                   ))}
+                </div>
+
+                <div className="mt-8 pt-8 border-t border-gray-50 grid grid-cols-2 gap-4">
+                   <div className="text-center">
+                      <div className="text-2xl font-black text-[#d32f2f]">{userBikes.length}</div>
+                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Ads</div>
+                   </div>
+                   <div className="text-center border-l border-gray-50">
+                      <div className="text-2xl font-black text-[#24272c]">0</div>
+                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Inquiries</div>
+                   </div>
                 </div>
               </div>
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900">{currentUser.name}</h2>
-              <div className="flex items-center justify-center gap-1 text-primary-600 font-bold text-xs mt-1">
-                <ShieldCheck size={14} />
-                Verified Member
-              </div>
+            </div>
+          </aside>
+
+          {/* Activity/Ads Center */}
+          <main className="lg:col-span-8 space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+               <div>
+                  <h1 className="text-3xl font-extrabold text-[#24272c] tracking-tight">Your Inventory</h1>
+                  <p className="text-gray-500 font-medium">Manage and track your active bike listings.</p>
+               </div>
+               <Link to="/add" className="btn-primary flex items-center gap-2 py-4 px-8 rounded-xl text-sm shadow-lg shadow-[#d32f2f]/20">
+                  <Plus size={18} /> Sell New Bike
+               </Link>
             </div>
 
-            <div className="mt-6 sm:mt-8 space-y-2 sm:space-y-3 text-left">
-              {[
-                { icon: Mail, value: currentUser.email },
-                { icon: Phone, value: currentUser.phone },
-                { icon: MapPin, value: currentUser.location },
-                { icon: Calendar, value: `Joined ${formatDate(currentUser.created_at || currentUser.joinDate)}` },
-              ].filter(item => item.value).map((item, i) => (
-                <div key={i} className="flex items-center gap-2.5 p-2.5 sm:p-3 bg-slate-50 rounded-xl">
-                  <item.icon size={15} className="text-slate-400 shrink-0" />
-                  <span className="text-xs sm:text-sm font-bold text-slate-600 truncate">{item.value}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Quick Stats */}
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <div className="bg-primary-50 rounded-xl p-3 text-center">
-                <div className="text-xl font-black text-primary-600">{userBikes.length}</div>
-                <div className="text-[10px] font-bold text-primary-500 uppercase">Listings</div>
-              </div>
-              <div className="bg-slate-50 rounded-xl p-3 text-center">
-                <div className="text-xl font-black text-slate-700">{userBikes.filter(b => b.status === 'active' || !b.status).length}</div>
-                <div className="text-[10px] font-bold text-slate-500 uppercase">Active</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Listings Content */}
-        <div className="lg:col-span-3 space-y-4 sm:space-y-6 lg:space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900">Your Listings</h1>
-            <Link
-              to="/add"
-              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white px-5 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm shadow-lg shadow-primary-600/20 hover:shadow-primary-600/40 transition-all active:scale-95"
-            >
-              <Plus size={18} />
-              Sell Another Bike
-            </Link>
-          </div>
-
-          {userBikes.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              {userBikes.map(bike => (
-                <div key={bike.id} className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden group">
-                  <div className="flex gap-3 sm:gap-4 lg:gap-6 p-3 sm:p-4 lg:p-6">
-                    <div className="w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-xl sm:rounded-2xl overflow-hidden shrink-0 bg-slate-100">
-                      <img 
-                        src={getImageUrl(bike)} 
-                        alt={bike.model} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => { e.target.src = '/images/bike1.jpg'; }}
-                      />
-                    </div>
-                    <div className="flex-grow min-w-0 flex flex-col">
-                      <div className="flex justify-between items-start gap-2">
-                        <h3 className="font-black text-slate-900 text-sm sm:text-base truncate">{bike.brand} {bike.model}</h3>
-                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-lg uppercase shrink-0 ${
-                          bike.status === 'sold' ? 'text-red-600 bg-red-50' :
-                          bike.status === 'pending' ? 'text-amber-600 bg-amber-50' :
-                          'text-primary-600 bg-primary-50'
-                        }`}>
-                          {bike.status || bike.type}
-                        </span>
-                      </div>
-                      <div className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                        {formatPrice(bike.price)}
-                      </div>
-                      <div className="flex items-center gap-2 sm:gap-3 text-slate-400 text-[10px] sm:text-xs font-bold mt-1 sm:mt-2">
-                        <span className="flex items-center gap-1"><Calendar size={11} /> {bike.year}</span>
-                        <span className="flex items-center gap-1"><MapPin size={11} /> {bike.locality}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 sm:gap-2 mt-auto pt-2 sm:pt-3">
-                        <Link
-                          to={`/details/${bike.id}`}
-                          className="p-1.5 sm:p-2 bg-slate-50 text-slate-400 hover:text-primary-600 rounded-lg sm:rounded-xl transition-colors"
-                          title="View"
-                        >
-                          <Eye size={15} />
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(bike.id)}
-                          className="p-1.5 sm:p-2 bg-slate-50 text-slate-400 hover:text-red-600 rounded-lg sm:rounded-xl transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 size={15} />
+            {userBikes.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {userBikes.map(bike => (
+                  <div key={bike.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden group">
+                     <div className="relative h-40 overflow-hidden bg-gray-100">
+                        <img src={getImageUrl(bike)} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                        <div className="absolute top-4 left-4">
+                           <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest shadow-lg ${
+                             bike.status === 'sold' ? 'bg-red-600 text-white' : 
+                             bike.status === 'pending' ? 'bg-amber-400 text-white' : 'bg-[#d32f2f] text-white'
+                           }`}>
+                             {bike.status || 'Active'}
+                           </span>
+                        </div>
+                        <div className="absolute top-4 right-4 flex gap-2">
+                           <Link to={`/details/${bike.id}`} className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-gray-600 hover:text-[#d32f2f] shadow-sm"><Eye size={16} /></Link>
+                           <button onClick={() => openDeleteModal(bike.id)} className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-gray-600 hover:text-red-600 shadow-sm"><Trash2 size={16} /></button>
+                        </div>
+                     </div>
+                     <div className="p-6">
+                        <h3 className="text-lg font-bold text-[#24272c] mb-1">{bike.brand} {bike.model}</h3>
+                        <div className="text-2xl font-black text-[#d32f2f] mb-4">{formatPrice(bike.price)}</div>
+                        <div className="flex items-center gap-4 py-4 border-t border-gray-50">
+                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-400"><Calendar size={14} /> {bike.year}</div>
+                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-400"><MapPin size={14} /> {bike.locality}</div>
+                        </div>
+                        <button className="w-full py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-[#d32f2f] hover:border-[#d32f2f]/20 transition-all flex items-center justify-center gap-1">
+                           Manage Ad <ChevronRight size={14} />
                         </button>
-                      </div>
-                    </div>
+                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 sm:py-16 lg:py-20 bg-white rounded-2xl sm:rounded-[3rem] border border-dashed border-slate-200">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 text-slate-400">
-                <Bike size={32} />
+                ))}
               </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900">No listings yet</h3>
-              <p className="text-slate-500 mt-2 max-w-xs mx-auto text-sm">
-                Create your first listing and reach buyers in Delhi.
-              </p>
-              <Link to="/add" className="mt-6 sm:mt-8 inline-block text-primary-600 font-bold text-sm hover:underline">
-                Create my first listing
-              </Link>
-            </div>
-          )}
+            ) : (
+              <div className="bg-white rounded-2xl border border-gray-100 border-dashed p-20 text-center shadow-sm">
+                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
+                    <Bike size={40} />
+                 </div>
+                 <h3 className="text-xl font-bold text-[#24272c]">You haven&apos;t listed any bikes yet</h3>
+                 <p className="text-gray-500 mt-2 font-medium">Be part of Delhi&apos;s biggest marketplace and sell your bike faster.</p>
+                 <Link to="/add" className="btn-primary mt-8 inline-flex px-10 py-4 shadow-lg shadow-[#d32f2f]/20">Start Selling Now</Link>
+              </div>
+            )}
+          </main>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        title="Remove Product Listing?"
+        message="This will permanently delete your bike advertisement from our marketplace results. This action cannot be undone."
+        confirmText="Confirm Deletion"
+      />
     </div>
   );
 };

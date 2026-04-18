@@ -1,92 +1,163 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+  --primary-red: #d32f2f;
+  --primary-red-hover: #b71c1c;
+  --bg-main: #f0f2f5;
+  --bg-card: #ffffff;
+  --text-main: #24272c;
+  --text-dim: #64748b;
+  --border-light: #e5e7eb;
+}
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  scroll-behavior: smooth;
 }
 
-@layer base {
-  * {
-    @apply border-slate-200;
-  }
-
-  body {
-    @apply bg-slate-50 text-slate-900 m-0 min-h-screen;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  /* Fix iOS input zoom */
-  input, select, textarea {
-    font-size: 16px !important;
-  }
-
-  @media (min-width: 640px) {
-    input, select, textarea {
-      font-size: inherit !important;
-    }
-  }
-
-  /* Ensure minimum tap target sizes on mobile */
-  @media (pointer: coarse) {
-    button, a, [role="button"] {
-      min-height: 44px;
-      min-width: 44px;
-    }
-  }
+/* Base Utility Overrides for Strict White Theme */
+.dark body {
+  background-color: var(--bg-main) !important;
+  color: var(--text-main) !important;
 }
 
-@layer components {
-  /* Custom scrollbar */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 999px;
-  }
-
-  /* Safe area padding for mobile */
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  .pt-safe {
-    padding-top: env(safe-area-inset-top, 0px);
-  }
-  .px-safe {
-    padding-left: env(safe-area-inset-left, 0px);
-    padding-right: env(safe-area-inset-right, 0px);
-  }
+/* Marketplace Card System */
+.market-card {
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@layer utilities {
-  /* Hide scrollbar but allow scrolling */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+.market-card:hover {
+  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+  transform: translateY(-4px);
+  border-color: #d1d5db;
+}
 
-  /* Gradient text support */
-  .text-gradient {
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+/* Horizontal Scrollbar Hide */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Red Button System */
+.btn-primary {
+  background-color: var(--primary-red) !important;
+  color: white !important;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-red-hover) !important;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary-red) !important;
+  border: 1.5px solid var(--primary-red) !important;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-outline:hover {
+  background: rgba(211, 47, 47, 0.05);
+}
+
+/* Functional Sections */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #24272c;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+.section-label {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--primary-red);
+  margin-bottom: 8px;
+}
+
+/* Brand Grid Circle */
+.brand-circle {
+  width: 80px;
+  height: 80px;
+  background: white;
+  border: 1.5px solid var(--border-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.brand-circle:hover {
+  border-color: var(--primary-red);
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
+}
+
+/* Search Island (Marketplace) */
+.market-search {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+  padding: 24px;
+  border: 1px solid var(--border-light);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Grid Layout Customizations */
+.grid-cols-brand {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .grid-cols-brand {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
   }
 }
 
@@ -95,40 +166,8 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Support reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Focus visible for keyboard navigation */
-*:focus-visible {
-  outline: 2px solid #d946ef;
-  outline-offset: 2px;
-  border-radius: 8px;
-}
-
 /* Selection color */
 ::selection {
-  background-color: #f5d0fe;
-  color: #4a044e;
-}
-
-/* Overscroll behavior */
-body {
-  overscroll-behavior-y: none;
-}
-
-/* Print styles */
-@media print {
-  nav, footer, button {
-    display: none !important;
-  }
+  background-color: #fee2e2;
+  color: #991b1b;
 }

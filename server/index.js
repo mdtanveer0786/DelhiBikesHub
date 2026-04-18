@@ -21,7 +21,7 @@ app.use(helmet({
 }));
 
 // Support multiple CORS origins for staging/production
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173,http://localhost:5174')
   .split(',')
   .map(url => url.trim());
 

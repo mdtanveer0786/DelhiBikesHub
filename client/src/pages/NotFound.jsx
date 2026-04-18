@@ -1,32 +1,42 @@
-import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-import { Home, ArrowLeft } from 'lucide-react';
+import { Home, ArrowLeft, Bike } from 'lucide-react';
 
 const NotFound = () => {
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-4">
-      <div className="text-center max-w-lg">
-        <div className="text-8xl sm:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-br from-primary-400 to-primary-700 mb-4">
+    <div className="min-h-[70vh] flex items-center justify-center px-4 bg-[#f0f2f5] font-sans">
+      <Helmet>
+        <title>404 - Hub Not Found | DelhiBikesHub</title>
+      </Helmet>
+      <div className="text-center max-w-lg bg-white p-12 rounded-2xl border border-gray-100 shadow-xl">
+        <div className="w-20 h-20 bg-gray-50 flex items-center justify-center text-gray-300 rounded-full mx-auto mb-8">
+           <Bike size={40} strokeWidth={1.5} />
+        </div>
+        <div className="text-8xl font-black text-[#24272c] tracking-tighter mb-4">
           404
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-4">Page Not Found</h1>
-        <p className="text-slate-500 mb-10 text-sm sm:text-base">
-          The page you're looking for doesn't exist or has been moved.
+        <h1 className="text-2xl font-black text-[#24272c] mb-4 uppercase tracking-widest">Hub Disconnected</h1>
+        <p className="text-gray-500 mb-10 font-medium leading-relaxed">
+          The listing or page you&apos;re looking for is no longer active in our marketplace hub.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             to="/"
-            className="inline-flex items-center justify-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-primary-600 transition-all active:scale-95"
+            className="btn-primary py-4 px-10 rounded-xl text-sm transition-all shadow-lg shadow-[#d32f2f]/20"
           >
-            <Home size={20} />
-            Go Home
+            <div className="flex items-center gap-2">
+               <Home size={18} />
+               Return to Marketplace
+            </div>
           </Link>
           <button
             onClick={() => window.history.back()}
-            className="inline-flex items-center justify-center gap-2 bg-slate-100 text-slate-700 px-8 py-4 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+            className="btn-outline py-4 px-10 rounded-xl text-sm"
           >
-            <ArrowLeft size={20} />
-            Go Back
+            <div className="flex items-center gap-2">
+               <ArrowLeft size={18} />
+               Previous Page
+            </div>
           </button>
         </div>
       </div>

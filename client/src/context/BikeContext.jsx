@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { bikesAPI, uploadAPI } from '../lib/api';
 
@@ -67,16 +67,22 @@ export const BikeProvider = ({ children }) => {
     }
   }, [bikes, isDemo]);
 
-  // Fetch bikes from API
+  // Fetch bikes from API with hardening
   const fetchBikes = useCallback(async (params = {}) => {
     if (isDemo) return;
     try {
       setLoading(true);
       const { data } = await bikesAPI.list(params);
-      setBikes(data.bikes);
-      setPagination(data.pagination);
+      if (data && data.bikes) {
+        setBikes(Array.isArray(data.bikes) ? data.bikes : []);
+        setPagination(data.pagination || { page: 1, limit: 12, total: 0, totalPages: 0 });
+      } else {
+        setBikes([]);
+      }
     } catch (err) {
-      console.error('Failed to fetch bikes:', err);
+      console.error('Signature Engine: Failed to fetch directory data:', err);
+      // Defensive fallback
+      setBikes([]);
     } finally {
       setLoading(false);
     }
